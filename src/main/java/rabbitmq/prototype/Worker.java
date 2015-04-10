@@ -13,6 +13,7 @@ import java.io.IOException;
 public class Worker {
 
     private final static String QUEUE_NAME = "hello";
+    private final static String QUEUE_NAME_DURABLE_QUEUE = "task_queue";
 
     public static void main(String[] argv)
             throws java.io.IOException,
@@ -23,7 +24,14 @@ public class Worker {
         Connection connection = factory.newConnection();
         Channel channel = connection.createChannel();
 
-        channel.queueDeclare(QUEUE_NAME, false, false, false, null);
+        boolean durable = true;
+
+        channel.queueDeclare(QUEUE_NAME_DURABLE_QUEUE, durable, false, false, null);
+
+        int prefetchCount = 1;
+
+        fairLoadForAllWorkers(channel, prefetchCount);
+
         System.out.println(" [*] Waiting for messages. To exit press CTRL+C");
 
 
@@ -31,7 +39,7 @@ public class Worker {
 
         boolean autoAck = resendIfAWorkerIsKilledAndMessageCouldNotBeSent();
 
-        channel.basicConsume(QUEUE_NAME, autoAck, consumer);
+        channel.basicConsume(QUEUE_NAME_DURABLE_QUEUE, autoAck, consumer);
 
         while (true) {
             QueueingConsumer.Delivery delivery = consumer.nextDelivery();
@@ -56,6 +64,11 @@ public class Worker {
      */
     private static void resendIfWorkerWasKilledDuringProcessing(Channel channel, QueueingConsumer.Delivery delivery) throws IOException {
         channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
+    }
+
+
+    private static void fairLoadForAllWorkers(Channel channel, int prefetchCount) throws IOException {
+        channel.basicQos(prefetchCount);
     }
 
     private static boolean resendIfAWorkerIsKilledAndMessageCouldNotBeSent() {

@@ -1,8 +1,8 @@
 package rabbitmq.prototype;
 
-import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ConnectionFactory;
-import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.*;
+
+import java.io.IOException;
 
 
 /**
@@ -11,6 +11,7 @@ import com.rabbitmq.client.Channel;
 public class NewTask {
 
     private final static String QUEUE_NAME = "hello";
+    private final static String QUEUE_NAME_DURABLE_QUEUE = "task_queue";
 
     public static void main(String[] argv)
             throws java.io.IOException {
@@ -19,17 +20,33 @@ public class NewTask {
         Connection connection = factory.newConnection();
         Channel channel = connection.createChannel();
 
-        channel.queueDeclare(QUEUE_NAME, false, false, false, null);
+        channel.queueDeclare(QUEUE_NAME_DURABLE_QUEUE, durable(), false, false, null);
 
         String message = getMessage(argv);
 
-        channel.basicPublish("", QUEUE_NAME, null, message.getBytes());
+        channel.basicPublish("", QUEUE_NAME_DURABLE_QUEUE,
+                            markMessageAsPersistent(),
+                            message.getBytes());
+
         System.out.println(" [x] Sent '" + message + "'");
 
         channel.close();
         connection.close();
 
 
+    }
+
+
+    /**
+     * This is a loose guarantee. If you need a stronger guarantee then you can use publisher confirms.
+     * @return
+     */
+    private static AMQP.BasicProperties markMessageAsPersistent() {
+        return MessageProperties.PERSISTENT_TEXT_PLAIN;
+    }
+
+    private static boolean durable() {
+        return false;
     }
 
     private static String getMessage(String[] strings){
