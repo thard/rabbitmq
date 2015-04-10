@@ -79,8 +79,7 @@ public class Worker {
     }
 
     /**
-     * This will make the Thread wait for 1000ms for each point contained in the String.
-     * Otherwise, this method would do serious work, here is where our System initiates the necessary
+     * This method would do serious work, here is where our System initiates the necessary
      * steps to execute a Task.
      *
      * @param task
