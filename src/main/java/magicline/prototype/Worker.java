@@ -8,7 +8,7 @@ import com.rabbitmq.client.QueueingConsumer;
 /**
  * Created by tharder on 09/04/15.
  */
-public class Recv {
+public class Worker {
 
     private final static String QUEUE_NAME = "hello";
 
@@ -31,7 +31,16 @@ public class Recv {
         while (true) {
             QueueingConsumer.Delivery delivery = consumer.nextDelivery();
             String message = new String(delivery.getBody());
+
             System.out.println(" [x] Received '" + message + "'");
+            doWork(message);
+            System.out.println(" [x] Done");
+        }
+    }
+
+    private static void doWork(String task) throws InterruptedException {
+        for (char ch: task.toCharArray()) {
+            if (ch == '.') Thread.sleep(1000);
         }
     }
 
