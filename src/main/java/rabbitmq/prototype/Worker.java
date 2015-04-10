@@ -1,4 +1,4 @@
-package magicline.prototype;
+package rabbitmq.prototype;
 
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.Connection;
@@ -49,7 +49,7 @@ public class Worker {
     /**
      * If you miss the ack, messages will be redelivered when the client (NewTask) quits,
      * but the successful messages will be kept in memory of RabbitMQ and eat it up.
-     * 
+     *
      * @param channel
      * @param delivery
      * @throws IOException

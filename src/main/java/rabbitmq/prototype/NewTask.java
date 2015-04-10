@@ -1,4 +1,4 @@
-package magicline.prototype;
+package rabbitmq.prototype;
 
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
