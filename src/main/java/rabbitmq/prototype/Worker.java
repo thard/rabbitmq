@@ -75,6 +75,14 @@ public class Worker {
         return false;
     }
 
+    /**
+     * This will make the Thread wait for 1000ms for each point contained in the String.
+     * Otherwise, this method would do serious work, here is where our System initiates the necessary
+     * steps to execute a Task.
+     * 
+     * @param task
+     * @throws InterruptedException
+     */
     private static void doWork(String task) throws InterruptedException {
         for (char ch: task.toCharArray()) {
             if (ch == '.') Thread.sleep(1000);
