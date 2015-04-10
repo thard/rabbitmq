@@ -1,9 +1,12 @@
 package rabbitmq.prototype;
 
+import com.cedarsoftware.util.io.JsonReader;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.QueueingConsumer;
+import com.rabbitmq.tools.json.JSONReader;
+import rabbitmq.prototype.message.Message;
 
 import java.io.IOException;
 
@@ -24,7 +27,7 @@ public class Worker {
         Connection connection = factory.newConnection();
         Channel channel = connection.createChannel();
 
-        boolean durable = true;
+        boolean durable = false;
 
         channel.queueDeclare(QUEUE_NAME_DURABLE_QUEUE, durable, false, false, null);
 
@@ -79,14 +82,19 @@ public class Worker {
      * This will make the Thread wait for 1000ms for each point contained in the String.
      * Otherwise, this method would do serious work, here is where our System initiates the necessary
      * steps to execute a Task.
-     * 
+     *
      * @param task
      * @throws InterruptedException
      */
     private static void doWork(String task) throws InterruptedException {
-        for (char ch: task.toCharArray()) {
-            if (ch == '.') Thread.sleep(1000);
+
+        try {
+            Message message = (Message) JsonReader.jsonToJava(task.replaceAll("\n","").trim());
+            System.out.println(message);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+
     }
 
 }
