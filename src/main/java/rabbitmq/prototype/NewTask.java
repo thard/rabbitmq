@@ -11,12 +11,15 @@ import java.io.IOException;
 public class NewTask {
 
     private final static String QUEUE_NAME = "hello";
-    private final static String QUEUE_NAME_DURABLE_QUEUE = "task_queue";
+    private final static String QUEUE_NAME_DURABLE_QUEUE = "event.queue";
 
     public static void main(String[] argv)
             throws java.io.IOException {
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost("localhost");
+        factory.setVirtualHost("test");
+        factory.setUsername("testuser");
+        factory.setPassword("pass");
         Connection connection = factory.newConnection();
         Channel channel = connection.createChannel();
 
