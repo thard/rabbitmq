@@ -2,13 +2,8 @@ package rabbitmq.prototype;
 
 import com.rabbitmq.client.*;
 
-import java.io.IOException;
 
-
-/**
- * Created by tharder on 09/04/15.
- */
-public class NewTask {
+public class QueueProducer {
 
     private final static String QUEUE_NAME = "hello";
     private final static String QUEUE_NAME_DURABLE_QUEUE = "event.queue";
@@ -17,9 +12,9 @@ public class NewTask {
             throws java.io.IOException {
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost("localhost");
-        factory.setVirtualHost("test");
-        factory.setUsername("testuser");
-        factory.setPassword("pass");
+        factory.setVirtualHost("vhost2");
+        factory.setUsername("testuser2");
+        factory.setPassword("pass2");
         Connection connection = factory.newConnection();
         Channel channel = connection.createChannel();
 
@@ -28,8 +23,8 @@ public class NewTask {
         String message = getMessage(argv);
 
         channel.basicPublish("", QUEUE_NAME_DURABLE_QUEUE,
-                            markMessageAsPersistent(),
-                            message.getBytes());
+                markMessageAsPersistent(),
+                message.getBytes());
 
         System.out.println(" [x] Sent '" + message + "'");
 
@@ -41,6 +36,7 @@ public class NewTask {
 
     /**
      * This is a loose guarantee. If you need a stronger guarantee then you can use publisher confirms.
+     *
      * @return
      */
     private static AMQP.BasicProperties markMessageAsPersistent() {
@@ -48,12 +44,12 @@ public class NewTask {
     }
 
     private static boolean durable() {
-        return false;
+        return true;
     }
 
-    private static String getMessage(String[] strings){
+    private static String getMessage(String[] strings) {
         if (strings.length < 1)
-            return "Hello World!";
+            return "Hello World! X";
         return joinStrings(strings, " ");
     }
 

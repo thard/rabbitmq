@@ -1,22 +1,16 @@
 package rabbitmq.prototype;
 
 import com.cedarsoftware.util.io.JsonReader;
-import com.rabbitmq.client.ConnectionFactory;
-import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.QueueingConsumer;
-import com.rabbitmq.tools.json.JSONReader;
-import rabbitmq.prototype.message.Message;
 
 import java.io.IOException;
 
-/**
- * Created by tharder on 09/04/15.
- */
-public class Worker {
+public class QueueConsumer {
 
-    private final static String QUEUE_NAME = "hello";
-    private final static String QUEUE_NAME_DURABLE_QUEUE = "task_queue";
+    private final static String QUEUE_NAME_DURABLE_QUEUE = "event.queue";
 
     public static void main(String[] argv)
             throws java.io.IOException,
@@ -24,10 +18,13 @@ public class Worker {
 
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost("localhost");
+        factory.setVirtualHost("vhost2");
+        factory.setUsername("testuser2");
+        factory.setPassword("pass2");
         Connection connection = factory.newConnection();
         Channel channel = connection.createChannel();
 
-        boolean durable = false;
+        boolean durable = true;
 
         channel.queueDeclare(QUEUE_NAME_DURABLE_QUEUE, durable, false, false, null);
 
@@ -49,7 +46,7 @@ public class Worker {
             String message = new String(delivery.getBody());
 
             System.out.println(" [x] Received '" + message + "'");
-            doWork(message);
+            //doWork(message);
             System.out.println(" [x] Done");
 
             resendIfWorkerWasKilledDuringProcessing(channel, delivery);
@@ -88,7 +85,7 @@ public class Worker {
     private static void doWork(String task) throws InterruptedException {
 
         try {
-            Message message = (Message) JsonReader.jsonToJava(task.replaceAll("\n","").trim());
+            String message = (String) JsonReader.jsonToJava(task.replaceAll("\n", "").trim());
             System.out.println(message);
         } catch (IOException e) {
             e.printStackTrace();
